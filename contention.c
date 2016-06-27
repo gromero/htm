@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#define THREAD_NUM 2
+#define THREAD_NUM 1
 
 pthread_t thread_pool[THREAD_NUM];
 static int lock = 0;
@@ -36,7 +36,8 @@ void *thread_main_routine(void *arg)
  // BODY
  while (1 == 1)
  {
-looper:
+loop01:
+ sleep(2);
  asm goto (
            "xor 14,14,14       \n\t"
            "addis 14,14, %1@ha \n\t"
@@ -48,26 +49,25 @@ looper:
            "addi 14, 14, 1     \n\t"
            "stdx 14, 0, %0     \n\t"
            "xor 14, 14, 14     \n\t"
-//           "addis 14, 14, %2@ha \n\t"
-//           "addi 14, 14, %2@l \n\t"
-           "mtctr 14 \n\t"
-           "bctrl   \n\t"
-           "bl htm_ok          \n\t"
+//         "addis 14, 14, %2@ha \n\t"
+//         "addi 14, 14, %2@l \n\t"
+//         "mtctr 14 \n\t"
+//         "bctrl   \n\t"
+//         "bl htm_ok          \n\t" // <= This causes a tabort, since printf call write() syscall.
            "tend.              \n\t"
-//           "xor 14, 14, 14     \n\t"
-//           "addis 14, 14, %2@ha\n\t"
-//           "addi  14, 14, %2@l \n\t"
-//           "mtctr 14           \n\t"
-//           "bctr               \n\t"
+//         "xor 14, 14, 14     \n\t"
+//         "addis 14, 14, %2@ha\n\t"
+//         "addi  14, 14, %2@l \n\t"
+//         "mtctr 14           \n\t"
+//         "bctr               \n\t"
           :
           : "r"(&lock)
           : "r14"
           : htm_failed
 	  );
-    goto looper;
+        goto loop01;
 htm_failed: printf("HTM failed\n");
 // htm_ok:     printf("HTM OK. lock -> %d\n", lock);
-
 //   __builtin_tbegin(0);
 //   printf("%d\n", lock++);
 //   __builtin_tend(0);
