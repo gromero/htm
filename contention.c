@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#define THREAD_NUM 1
+#define THREAD_NUM 1000
 
 pthread_t thread_pool[THREAD_NUM];
 static int lock = 0;
@@ -37,7 +37,7 @@ void *thread_main_routine(void *arg)
  while (1 == 1)
  {
 loop01:
- sleep(2);
+ sleep(1);
  asm goto (
            "xor 14,14,14       \n\t"
            "addis 14,14, %1@ha \n\t"
@@ -53,7 +53,7 @@ loop01:
 //         "addi 14, 14, %2@l \n\t"
 //         "mtctr 14 \n\t"
 //         "bctrl   \n\t"
-//         "bl htm_ok          \n\t" // <= This causes a tabort, since printf call write() syscall.
+//         "bl htm_ok          \n\t" // <= This causes a tabort, since printf calls write() syscall.
            "tend.              \n\t"
 //         "xor 14, 14, 14     \n\t"
 //         "addis 14, 14, %2@ha\n\t"
