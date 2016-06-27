@@ -81,24 +81,6 @@ int main(void)
 {
  int x = 4;
 
- asm goto (
-           "ldx    14, 0, %0    \t\n"
-           "addi   14, 14, 1    \t\n"
-	   "stdx   14, 0, %0    \t\n"
-
-           "xor   14, 14, 14    \t\n"
-           "addis 14,14, %1@ha  \t\n"
-	   "addi  14,14, %1@l   \t\n"
-	   "mtctr 14            \t\n"
-           "bctr		\t\n"
-     :
-     : "r"(&x)
-     : "r14"
-     : /* bout */ entrance
-    );
-
-entrance:
-
  for (int i = 0; i < THREAD_NUM; ++i)
  {
    pthread_create(&thread_pool[i], NULL, thread_main_routine, NULL);
@@ -107,7 +89,4 @@ entrance:
 
  // Sit idle.
  while(1 == 1);
-
-bout: printf("Bailing out! x -> %d\n", x);
-
 }
