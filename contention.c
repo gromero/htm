@@ -38,6 +38,8 @@ update_state:
            "mtcr  15          \n\t"
            "tbegin.           \n\t" // HTM BEGIN.
            "beqctr            \n\t" // HTM FAILED.
+           "addi 14, 0, 0xBE  \n\t"
+           "tabort. 14        \n\t"
            "bl set_state_and_increment_pos \n\t" // otherwise set current state to 1 and increment by 1 the current state position.
            "tend.             \n\t" // HTM END.
 /*
