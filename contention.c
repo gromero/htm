@@ -39,7 +39,7 @@ update_state:
            "tbegin.           \n\t" // HTM BEGIN.
            "beqctr            \n\t" // HTM FAILED.
            "addi 14, 0, 0xBE  \n\t"
-           "tabort. 14        \n\t"
+//         "tabort. 14        \n\t" // <============================ UNCOMMENT HERE TO TEST
            "bl set_state_and_increment_pos \n\t" // otherwise set current state to 1 and increment by 1 the current state position.
            "tend.             \n\t" // HTM END.
 /*
@@ -71,9 +71,12 @@ htm_succeeded:    // printf("HTM succeeded, state_pos -> %d\n", state_pos);
                   else
 	           goto update_state;
 
-htm_failed:       printf("HTM failed\n");
-                  goto update_state;
-
+htm_failed:       if ( (get_texasr() >> 32) == 0xBE000001 ) {
+                   printf("HTM abort: nothing to do anymore\n");
+                   goto bail_out;
+                  }
+   		  else
+                   goto update_state;
 bail_out:         printf("Existing...\n");
 }
 
