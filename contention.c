@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#define THREAD_NUM 15
+#define THREAD_NUM 1
 #define STATE_NUM 20
 
 #define STRINGINIFY_IT1(x) #x
@@ -18,6 +18,11 @@ int state[STATE_NUM];
 void set_state_and_increment_pos(void)
 {
  state[state_pos++] = 1;
+}
+
+unsigned long get_texasr(void)
+{
+ return __builtin_get_texasr();
 }
 
 void *thread_main_routine(void *arg)
