@@ -19,15 +19,7 @@
 #define STR(x) STR1(x)
 #define STR1(x) #x
 
-// Declaring counter variable as associated to a specific register is absolutely
-// necessary here since we are using it in the comparison - cpwdi - inside inline
-// asm. If it's not reclared this way it will reside in the locals, i.e. in the stack,
-// and the inline comparison will just miss its updated value done by increment_counter()
-// because in the inline asm we do not load counter value from the memory (locals, stack).
-// This is tricky for sure. I'm using r15, but could be any volatile register.
-//register int counter asm ("r15");
-
-static int state[MAX_COUNTER*2];
+static int state[MAX_COUNTER];
 
 static int counter;
 static int* counter_ptr = &counter;
