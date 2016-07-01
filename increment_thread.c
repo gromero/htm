@@ -11,8 +11,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#define MAX_COUNTER 4
-#define MAX_THREAD  1
+#define MAX_COUNTER 0x7FFF
+#define MAX_THREAD  1000
 
 // Two levels of expansion to get a macro value stringinified.
 #define STR(x) STR1(x)
