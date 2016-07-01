@@ -94,3 +94,12 @@ int main(void)
 
   printf("\ncounter: %d\n", counter);
 }
+
+
+/* References:
+
+   [1] https://www.ibm.com/support/knowledgecenter/ssw_aix_61/com.ibm.aix.genprogc/transactional_memory.htm
+
+
+
+ */
