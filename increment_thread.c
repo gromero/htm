@@ -9,8 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
 
-#define MAX_COUNTER 10
+#define MAX_COUNTER 4
+#define MAX_THREAD  1
 
 // Two levels of expansion to get a macro value stringinified.
 #define STR(x) STR1(x)
@@ -22,28 +24,50 @@
 // and the inline comparison will just miss its updated value done by increment_counter()
 // because in the inline asm we do not load counter value from the memory (locals, stack).
 // This is tricky for sure. I'm using r15, but could be any volatile register.
-register int counter asm ("r15");
+//register int counter asm ("r15");
 
+static int counter;
+static int* counter_ptr = &counter;
+
+pthread_t thread[MAX_THREAD];
 
 void increment_counter(void)
 {
-  counter++;
+  ++*counter_ptr;
 }
+
+void* thread_main_routine(void *arg)
+{
+//  while (counter < MAX_COUNTER)
+//   increment_counter();
+//  But in inline asm:
+
+  asm(
+     "           mflr 14                       \n\t"
+     "increment: lwa 15, 0(%0)                 \n\t"
+     "           cmpwi 15, " STR(MAX_COUNTER) "\n\t"
+     "           bge exit                      \n\t"
+     "           bl increment_counter          \n\t"
+     "           b increment                   \n\t"
+     "exit:      mtlr 14                       \n\t"
+     : // no output
+     : "r"(counter_ptr)
+     : "r14","r15"
+     );
+
+  return NULL;
+}
+
 
 int main(void)
 {
   counter = 0; // Just init the counter.
 
-  asm(
-     "increment: cmpwi %0, " STR(MAX_COUNTER) "\n\t"
-     "           bge exit                      \n\t"
-     "           bl increment_counter          \n\t"
-     "           b increment                   \n\t"
-     "exit:      nop                           \n\t"
-     : /* no output */
-     : "r"(counter)
-     : /* no clobber */
-     );
+  for (int i = 0; i < MAX_THREAD; i++)
+   pthread_create(&thread[i], NULL, &thread_main_routine,  NULL);
 
- printf("counter: %d\n", counter);
+  for (int i =0; i < MAX_THREAD; i++)
+   pthread_join(thread[i], NULL);
+
+  printf("counter: %d\n", counter);
 }
