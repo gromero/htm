@@ -13,6 +13,10 @@ increment: increment.o increment.S
 increment_thread: increment_thread.o increment_thread.S
 	gcc -pthread -mcpu=power8 -g -O0 -o increment_thread increment_thread.o
 
+increment_thread_htm: increment_thread_htm.o increment_thread_htm.S
+	gcc -pthread -mhtm -mcpu=power8 -g -O0 -o increment_thread_htm increment_thread_htm.o
+
+
 clean:
 	rm -fr *.o *.S contention
 	rm increment
