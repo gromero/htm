@@ -12,8 +12,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#define MAX_COUNTER 125
-#define MAX_THREAD  8
+#define MAX_COUNTER 0x7fff
+#define MAX_THREAD  1024
 
 // Two levels of expansion to get a macro value stringinified.
 #define STR(x) STR1(x)
@@ -44,20 +44,32 @@ void* thread_main_routine(void *arg)
 {
 //  while (counter < MAX_COUNTER)
 //   increment_counter();
-//  But in inline asm:
+//  + HTM (Hardware Transactional Memory) =
 
   asm(
      "           mflr 14                       \n\t"
      "           mr 16, %0                     \n\t" // Save counter_ptr in r16. Maybe use stack instead, since r15 is also volatile?
-     "increment: lwa 15, 0(16)                 \n\t" // Copy counter to r15.
+     "increment: tbegin.                       \n\t"
+     "           beq failure                   \n\t"
+     "           lwa 15, 0(16)                 \n\t" // Copy counter to r15.
      "           cmpwi 15, " STR(MAX_COUNTER) "\n\t"
-     "           bge exit                      \n\t"
-     "           bl increment_counter          \n\t"
+     "           blt continue                  \n\t"
+     "           li  17, 0xBE                  \n\t" // User-provided 8-bit tabort code
+     "	         tabort. 17                    \n\t"
+     "continue:  bl increment_counter          \n\t"
+     "           tend.                         \n\t"
      "           b increment                   \n\t"
-     "exit:      mtlr 14                       \n\t"
+     "failure:   mfspr 15, 130                 \n\t"
+     "           li    17, 32                  \n\t"
+     "           srd   15, 15, 17              \n\t"
+     "           addis 17, 0 , 0xBE00          \n\t"
+     "           addi  17, 17, 0x0001          \n\t"
+     "           cmpw  15, 17                  \n\t"
+     "           bne increment                 \n\t"
+     "           mtlr 14                       \n\t"
      : // no output
      : "r"(counter_ptr)
-     : "r14","r15", "r16"
+     : "r14","r15", "r16", "r17"
      );
 
   return NULL;
