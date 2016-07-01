@@ -4,6 +4,7 @@
  * 1. Two level stringinification;
  * 2. How to use stringinified value in a comparison instruction resided a inline asm;
  * 2. How to call a function from inside a inline asm on PPC64.
+ *
  */
 
 #include <stdio.h>
@@ -11,8 +12,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#define MAX_COUNTER 2
-#define MAX_THREAD  1
+#define MAX_COUNTER 125
+#define MAX_THREAD  8
 
 // Two levels of expansion to get a macro value stringinified.
 #define STR(x) STR1(x)
@@ -36,7 +37,7 @@ pthread_t thread[MAX_THREAD];
 
 void increment_counter(void)
 {
-  state[++*counter_ptr] = 1;
+  state[(*counter_ptr)++] = 1;
 }
 
 void* thread_main_routine(void *arg)
@@ -47,14 +48,15 @@ void* thread_main_routine(void *arg)
 
   asm(
      "           mflr 14                       \n\t"
-     "increment: lwa 15, 0(%0)                 \n\t"
+     "           mr 16, %0                     \n\t" // Save counter_ptr in r16. Maybe use stack instead, since r15 is also volatile?
+     "increment: lwa 15, 0(16)                 \n\t" // Copy counter to r15.
      "           cmpwi 15, " STR(MAX_COUNTER) "\n\t"
      "           bge exit                      \n\t"
      "           bl increment_counter          \n\t"
      "           b increment                   \n\t"
      "exit:      mtlr 14                       \n\t"
      : // no output
-     : "r"(counter_ptr), "r"(state)
+     : "r"(counter_ptr)
      : "r14","r15", "r16"
      );
 
