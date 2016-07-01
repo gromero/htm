@@ -10,5 +10,10 @@ all:	contention.o contention.S
 increment: increment.o increment.S
 	gcc -mcpu=power8 -g -O0 -o increment increment.o
 
+increment_thread: increment_thread.o increment_thread.S
+	gcc -pthread -mcpu=power8 -g -O0 -o increment_thread increment_thread.o
+
 clean:
 	rm -fr *.o *.S contention
+	rm increment
+	rm increment_thread
