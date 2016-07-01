@@ -32,6 +32,12 @@ void increment_counter(void)
   state[(*counter_ptr)++] = 1;
 }
 
+void failure_msg(void)
+{
+  printf(".\n");
+}
+
+
 void* thread_main_routine(void *arg)
 {
 //  while (counter < MAX_COUNTER)
@@ -57,6 +63,8 @@ void* thread_main_routine(void *arg)
      "           addis 17, 0 , 0xBE00          \n\t"
      "           addi  17, 17, 0x0001          \n\t"
      "           cmpw  15, 17                  \n\t"
+     "           bnel failure_msg              \n\t"
+     "           cmpw  15, 17                  \n\t" // Can it be removed?
      "           bne increment                 \n\t"
      "           mtlr 14                       \n\t"
      : // no output
