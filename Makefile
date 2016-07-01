@@ -19,5 +19,6 @@ increment_thread_htm: increment_thread_htm.o increment_thread_htm.S
 
 clean:
 	rm -fr *.o *.S contention
-	rm increment
-	rm increment_thread
+	rm -fr increment
+	rm -fr increment_thread
+	rm -fr increment_thread_htm
