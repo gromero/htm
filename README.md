@@ -13,3 +13,8 @@ Question: Can a SIGTRAP cause a HTM abortion? If so, what are the symptoms (IP, 
 
    We'll try to alucidate this by look at the abortion rate of HTMs in the presence of periodic
    SIGTRAP sent to the process where the threads performing HTM reside.
+
+
+```
+for i in `seq 1 200`; do ./increment_thread_htm |& fgrep .  |& wc -l |& tee -a increment_thread_htm_0x7FFF_0x3FFF; done
+```
