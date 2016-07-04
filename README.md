@@ -17,4 +17,11 @@ Question: Can a SIGTRAP cause a HTM abortion? If so, what are the symptoms (IP, 
 
 ```
 for i in `seq 1 200`; do ./increment_thread_htm |& fgrep .  |& wc -l |& tee -a increment_thread_htm_0x7FFF_0x3FFF; done
+for i in `seq 1 100`; do ./increment_thread_htm_syscall |& gawk ' /\./ { htm_failures++ }  />/ { tics++ }  END {print "tics:",tics, "HTM failures:", htm_failures}'; done > ./increment_thread_htm_syscall_0x7FFF_15_100
+for i in `seq 1 100`; do ./increment_thread_htm_syscall |& gawk ' /\./ { htm_failures++ }  />/ { tics++ }  END {print "tics:",tics, "HTM failures:", htm_failures}'; done | gawk '{i++;failures+=$5} END {print "Mean:", failures/i}'
 ```
+
+= Backlog:
+
+- Measuring performance and contention at the same time is tricky, since optimum performance depends upon # of threads/ # of CPU threads;
+- Measuring thread performance must be done indepedenytly of contention and firstly;
