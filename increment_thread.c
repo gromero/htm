@@ -12,7 +12,7 @@
 #include <pthread.h>
 
 #define MAX_COUNTER 0x7FFF
-#define MAX_THREAD  1000
+#define MAX_THREAD  0x3
 
 // Two levels of expansion to get a macro value stringinified.
 #define STR(x) STR1(x)
