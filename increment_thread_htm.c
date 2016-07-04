@@ -89,8 +89,10 @@ int main(void)
   for (int i = 0; i < MAX_THREAD; i++)
    pthread_join(thread[i], NULL);
 
+/*
   for (int i = 0; i < MAX_COUNTER; i++)
    printf("%d ", state[i]);
+*/
 
   printf("\ncounter: %d\n", counter);
 }
