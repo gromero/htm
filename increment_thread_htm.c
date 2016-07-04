@@ -52,7 +52,7 @@ void* thread_main_routine(void *arg)
      "           lwa 15, 0(16)                 \n\t" // Copy counter to r15.
      "           cmpwi 15, " STR(MAX_COUNTER) "\n\t"
      "           blt continue                  \n\t"
-     "           li  17, 0xBE                  \n\t" // User-provided 8-bit tabort code
+     "           li  17, 0xBE                  \n\t" // User-provided 8-bit tabort code. 0xBE means counter reached MAX_COUNTER.
      "	         tabort. 17                    \n\t"
      "continue:  bl increment_counter          \n\t"
      "           tend.                         \n\t"
