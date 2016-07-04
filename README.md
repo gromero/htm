@@ -5,7 +5,7 @@ Question: Can a SIGTRAP cause a HTM abortion? If so, what are the symptoms (IP, 
 
 1. Can an additional thread performing just syscall disturb (abort) the HTM on the other threads?
 
-   We'll try to ellucidate this question by look at the abortion rate of HTMs in the presence of
+   We'll try to elucidate this question by look at the abortion rate of HTMs in the presence of
    a noise thread performing periodic syscalls in comparison to aborting rates without a thread
    performing syscalls.
 
