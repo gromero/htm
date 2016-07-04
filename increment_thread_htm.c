@@ -94,7 +94,7 @@ int main(void)
    printf("%d ", state[i]);
 */
 
-  printf("\ncounter: %d\n", counter);
+  printf("counter: %d\n", counter);
 }
 
 
