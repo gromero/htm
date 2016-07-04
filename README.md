@@ -21,7 +21,13 @@ for i in `seq 1 100`; do ./increment_thread_htm_syscall |& gawk ' /\./ { htm_fai
 for i in `seq 1 100`; do ./increment_thread_htm_syscall |& gawk ' /\./ { htm_failures++ }  />/ { tics++ }  END {print "tics:",tics, "HTM failures:", htm_failures}'; done | gawk '{i++;failures+=$5} END {print "Mean:", failures/i}'
 ```
 
-= Backlog:
+### Backlog
 
 - Measuring performance and contention at the same time is tricky, since optimum performance depends upon # of threads/ # of CPU threads;
 - Measuring thread performance must be done indepedenytly of contention and firstly;
+
+### Conclusion
+
+1. Since HTM block is atomic for any code outside, additional threads that perform syscalls outside the transaction have no effect on HTM failures (rate of abortion does not change);
+2. The effect of contention is inconclusive if the test case spawns a total number of thread greater than the number of CPUs (HW threads?);
+3. It's yet to be done the test to determine when a given number of threads causes performance degradation for the case test.
