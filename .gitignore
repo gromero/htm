@@ -4,3 +4,4 @@ contention
 increment
 increment_thread
 increment_thread_htm
+increment_thread_htm_syscall
