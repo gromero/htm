@@ -3,8 +3,8 @@
  *
  * 1. Two level stringinification;
  * 2. How to use stringinified value in a comparison instruction resided a inline asm;
- * 2. How to call a function from inside a inline asm on PPC64.
- *
+ * 2. How to call a function from inside a inline asm on PPC64;
+ * 3. Verify the effact of a SIGTRAP.
  */
 
 #include <stdio.h>

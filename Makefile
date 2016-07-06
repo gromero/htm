@@ -18,6 +18,10 @@ increment_thread_htm: increment_thread_htm.o increment_thread_htm.S
 
 increment_thread_htm_syscall: increment_thread_htm_syscall.o increment_thread_htm_syscall.S
 	gcc -pthread -mhtm -mcpu=power8 -g -O0 -o increment_thread_htm_syscall increment_thread_htm_syscall.o
+
+increment_thread_htm_signal: increment_thread_htm_signal.o increment_thread_htm_signal.S
+	gcc -pthread -mhtm -mcpu=power8 -g -O0 -o increment_thread_htm_signal increment_thread_htm_signal.o
+
 clean:
 	rm -fr *.o *.S contention
 	rm -fr increment

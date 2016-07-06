@@ -31,6 +31,7 @@ static int tic = 0;
 pthread_t thread[MAX_THREAD];
 pthread_t thread_noise;
 
+ucontext_t *ucp;
 void increment_counter(void)
 {
   state[(*counter_ptr)++] = 1;
