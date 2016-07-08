@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <pthread.h>
 
@@ -99,11 +100,12 @@ int main(void)
      "           mflr 14                       \n\t"
      "           mr 16, %0                     \n\t" // Save counter_ptr in r16. Maybe use stack instead, since r15 is also volatile?
      "increment: tbegin.                       \n\t"
-     "           beq failure                   \n\t"
+     "           beq exit                      \n\t"
      "           lwa 15, 0(16)                 \n\t" // Copy counter to r15.
      "           cmpwi 15, " STR(MAX_COUNTER) "\n\t"
-//     "           blt continue                  \n\t"
-     "           b .                       \n\t"
+     "           blt continue                  \n\t"
+     "           tcheck        2                \n\t"
+     "           b .-0x4                       \n\t"
      "           li  17, 0xBE                  \n\t" // User-provided 8-bit tabort code. 0xBE means counter reached MAX_COUNTER.
      "           tabort. 17                    \n\t"
      "continue:  bl increment_counter          \n\t"
@@ -119,11 +121,16 @@ int main(void)
      "           cmpw  15, 17                  \n\t" // Can it be removed?
      "           bne increment                 \n\t"
      "           mtlr 14                       \n\t"
+     "exit:                                    \n\t"
      : // no output
      : "r"(counter_ptr)
      : "r14","r15", "r16", "r17"
      );
 
+  uint64_t texasr = __builtin_get_texasr();
+  uint8_t code = texasr >> 56;
+
+  printf("code: 0x%X\n", code);
   printf("counter: %d\n", counter);
 }
 
