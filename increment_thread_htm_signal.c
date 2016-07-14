@@ -47,7 +47,18 @@ void failure_msg(void)
 {
 //  printf(".\n");
  unsigned long texasr = __builtin_get_texasr();
- unsigned int code = texasr >> (64 - 7);
+ unsigned int code = texasr >> (64 - 8);
+
+/*
+ TM_CAUSE_RESCHED       Thread was rescheduled.
+ TM_CAUSE_TLBI          Software TLB invalid.
+ TM_CAUSE_FAC_UNAV      FP/VEC/VSX unavailable trap.
+ TM_CAUSE_SYSCALL       Syscall from active transaction.
+ TM_CAUSE_SIGNAL        Signal delivered.
+ TM_CAUSE_MISC          Currently unused.
+ TM_CAUSE_ALIGNMENT     Alignment fault.
+ TM_CAUSE_EMULATE       Emulation that touched memory.
+*/
 
  switch (code)
  {
