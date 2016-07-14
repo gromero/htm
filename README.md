@@ -25,6 +25,10 @@ for i in `seq 1 100`; do ./increment_thread_htm_syscall |& gawk ' /\./ { htm_fai
 
 - Measuring performance and contention at the same time is tricky, since optimum performance depends upon # of threads/ # of CPU threads;
 - Measuring thread performance must be done indepedenytly of contention and firstly;
+- Can't get TFIAR value after failure by any measn;
+- Every thread has its own independent copy of TFIAR?;
+- Does a signal interrupt all threads an cause an HTM abort a thread in such a state?;
+
 
 ### Conclusion
 
