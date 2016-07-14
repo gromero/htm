@@ -119,14 +119,16 @@ void* thread_main_routine(void *arg)
      "           addis 17, 0 , 0xBE00          \n\t"
      "           addi  17, 17, 0x0001          \n\t"
      "           cmpw  15, 17                  \n\t"
-     "failure:   bl failure_msg                \n\t"
+     "failure:   mfspr 19, 130                 \n\t" // Read TEXASR
+     "           mfspr 18, 129                 \n\t" // Read TFIAR
+     "           bl failure_msg                \n\t"
      "           b increment                   \n\t"
      "           cmpw  15, 17                  \n\t" // Can it be removed?
      "           bne increment                 \n\t"
      "           mtlr 14                       \n\t"
      : // no output
      : "r"(counter_ptr)
-     : "r14","r15", "r16", "r17"
+     : "r14","r15", "r16", "r17", "r18", "r19"
      );
 
   return NULL;
