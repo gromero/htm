@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <inttypes.h>
+
 #include <ucontext.h>
 
 #include <asm/tm.h>
@@ -35,7 +37,6 @@ void signal_handler(int signo)
 {
   if (signo == SIGTRAP)
    printf("SIGTRAP\n");
-  while (1 == 1);
 }
 
 void increment_counter(void)
@@ -81,17 +82,12 @@ void failure_msg(void)
    default:                ; // printf("0x%X: unknown error code!\n", code);
  }
 
-/*
- TM_CAUSE_RESCHED       Thread was rescheduled.
- TM_CAUSE_TLBI          Software TLB invalid.
- TM_CAUSE_FAC_UNAV      FP/VEC/VSX unavailable trap.
- TM_CAUSE_SYSCALL       Syscall from active transaction.
- TM_CAUSE_SIGNAL        Signal delivered.
- TM_CAUSE_MISC          Currently unused.
- TM_CAUSE_ALIGNMENT     Alignment fault.
- TM_CAUSE_EMULATE       Emulation that touched memory.
-*/
+ // TEXASR_37 => if 1 TFIAR is ok
+ uint64_t _code = ( texasr >>  (64 - 37)) & 1;
+ if (_code)
+   printf("TFIAR: %" PRIx64 "\n", __builtin_get_tfiar());
 
+ sleep(1);
 }
 
 void* thread_main_routine(void *arg)
@@ -105,8 +101,7 @@ void* thread_main_routine(void *arg)
      "           mr   16, %0                   \n\t" // Save counter_ptr in r16. Maybe use stack instead, since r15 is also volatile?
      "increment: tbegin.                       \n\t"
      "           beq failure                   \n\t"
-     "           li 15, " STR(TM_CAUSE_SYSCALL) "\n\t"
-     "           tabort. 15                    \n\t"
+     "           trap 			       \n\t"
      "           b increment                   \n\t"
      "           lwa   15, 0(16)               \n\t" // Copy counter to r15.
      "           cmpwi 15, " STR(MAX_COUNTER) "\n\t"
@@ -117,7 +112,6 @@ void* thread_main_routine(void *arg)
      "continue:  bl increment_counter          \n\t"
      "end:       tend.                         \n\t"
      "           b increment                   \n\t"
-//   "failure:   mfspr 15, 130                 \n\t"
      "           li    17, 32                  \n\t"
      "           srd   15, 15, 17              \n\t"
      "           addis 17, 0 , 0xBE00          \n\t"
@@ -167,6 +161,4 @@ int main(void)
 
    [1] https://www.ibm.com/support/knowledgecenter/ssw_aix_61/com.ibm.aix.genprogc/transactional_memory.htm
 
-
-
- */
+*/
