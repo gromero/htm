@@ -50,6 +50,13 @@ void failure_msg(void)
  unsigned long texasr = __builtin_get_texasr();
  unsigned int code = texasr >> (64 - 8);
 
+
+ // TEXASR_37 => if 1 TFIAR is ok
+ int _code = ( texasr >>  (64 - 37)) & 1;
+ uint64_t _tfiar = __builtin_get_tfiar();
+ // if (_code)
+ printf("_code: %d, TFIAR: %" PRIx64 "\n", _code, _tfiar);
+
 /*
  TM_CAUSE_RESCHED       Thread was rescheduled.
  TM_CAUSE_TLBI          Software TLB invalid.
@@ -81,11 +88,6 @@ void failure_msg(void)
 	                   break;
    default:                ; // printf("0x%X: unknown error code!\n", code);
  }
-
- // TEXASR_37 => if 1 TFIAR is ok
- uint64_t _code = ( texasr >>  (64 - 37)) & 1;
- if (_code)
-   printf("TFIAR: %" PRIx64 "\n", __builtin_get_tfiar());
 
  sleep(1);
 }
