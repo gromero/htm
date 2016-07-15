@@ -22,8 +22,12 @@ increment_thread_htm_syscall: increment_thread_htm_syscall.o increment_thread_ht
 increment_thread_htm_signal: increment_thread_htm_signal.o increment_thread_htm_signal.S
 	gcc -pthread -mhtm -mcpu=power8 -g -O0 -o increment_thread_htm_signal increment_thread_htm_signal.o
 
+threads01:	threads01.o
+	gcc -pthread -mhtm -mcpu=power8 -g -O0 threads01.o -o threads01
+
 clean:
 	rm -fr *.o *.S contention
 	rm -fr increment
 	rm -fr increment_thread
 	rm -fr increment_thread_htm
+	rm -fr threads01
