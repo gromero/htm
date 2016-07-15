@@ -1,6 +1,6 @@
 ### Study on Linux threads and signals
 
-#### [thread01.c] (thread01.c)
+#### [threads01.c] (threads01.c)
 
 What happens when a multithread process gets a signal?
 - Does it stop all threads?
