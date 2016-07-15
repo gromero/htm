@@ -22,3 +22,16 @@ since the signal handler will return (will not stay forever in the idle loop),
 and this can be verified by sending randomly as much as SIG{ILL,HUP} you wish
 and verifying that you still need exactly three SIGTRAPs to lock all the
 threads, given that you did not send any SIGTRAP before ;-)
+
+#### [threads02.c] (threads02.c) vs [threads03.c] (threads03.c)
+
+This is a example on how to block or unblock a set of signals as per thread. At
+first, it seems straightforward that just passing `&setsig` and the action on it,
+i.e `SIG_BLOCK or SIG_UNBLOCK` when creating a thread is just fine - when calling
+`pthread_create()`, however, in fact, the last call on this function will also
+determine the block state in the main thread. So to adjust the main thread block
+state it's necessary to call `sigprocmask()` *after* we create and set the block
+state for the last thread (in this case *t1*). Thus in [threads02.c] (threads02.c)
+main thread is not really blocked regarding SIGTRAP since `sigprocmask()` it's
+called before `pthread_create()`. However, in [threads03.c] (threads03.c) SIGTRAP
+is blocked, since `sigprocmask()` is called after `pthread_create()`.
