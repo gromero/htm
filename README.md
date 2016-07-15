@@ -1,4 +1,7 @@
-### HTM investigations
+HTM investigations
+==================
+
+### Introduction
 
 - Example on how HTM on PPC64 LE is an atomic operation;
 - Usage of user-provided tabort code as a failure hint to anything outside the HTM block.
@@ -25,23 +28,24 @@ for i in `seq 1 100`; do ./increment_thread_htm_syscall |& gawk ' /\./ { htm_fai
 for i in `seq 1 100`; do ./increment_thread_htm_syscall |& gawk ' /\./ { htm_failures++ }  />/ { tics++ }  END {print "tics:",tics, "HTM failures:", htm_failures}'; done | gawk '{i++;failures+=$5} END {print "Mean:", failures/i}'
 ```
 
-#### Backlog
+### Backlog
 
 - Measuring performance and contention at the same time is tricky, since optimum performance depends upon # of threads/ # of CPU threads;
 - Measuring thread performance must be done indepedenytly of contention and firstly;
 
-#### Conclusion
+### Conclusion
 
 1. Since HTM block is atomic for any code outside, additional threads that perform syscalls outside the transaction have no effect on HTM failures (rate of abortion does not change);
 2. The effect of contention is inconclusive if the test case spawns a total number of thread greater than the number of CPUs (HW threads?);
 3. It's yet to be done the test to determine when a given number of threads causes performance degradation for the case test.
 
 
-### A minuscule study on Linux threads and signals
+A minuscule study on Linux threads and signals
+==============================================
 
-#### [threads01.c] (threads01.c)
+### [threads01.c] (threads01.c)
 
-What happens when a multithread process gets a signal?
+What happens when a multithread process gets a signal:
 - Does it stop all threads?
 - Does it stop a single thread at random?
 
@@ -62,7 +66,7 @@ and this can be verified by sending randomly as much as SIG{ILL,HUP} you wish
 and verifying that you still need exactly three SIGTRAPs to lock all the
 threads, given that you did not send any SIGTRAP before ;-)
 
-#### [threads02.c] (threads02.c) vs [threads03.c] (threads03.c)
+### [threads02.c] (threads02.c) vs [threads03.c] (threads03.c)
 
 This is a example on how to block or unblock a set of signals as per thread. At
 first, it seems straightforward that just passing `&setsig` and the action on it,
@@ -75,7 +79,7 @@ main thread is not really blocked regarding SIGTRAP since `sigprocmask()` it's
 called before `pthread_create()`. However, in [threads03.c] (threads03.c) SIGTRAP
 is blocked, since `sigprocmask()` is called after `pthread_create()`.
 
-#### [threads04.c] (threads04.c)
+### [threads04.c] (threads04.c)
 
 This example tries to show two things: (1) that signals can be delivered as per
 thread and (2) a SIGTRAP caught from a `kill -SIGTRAP <pid>` is not the same as
@@ -122,8 +126,6 @@ I'm thread 3fff9a4af1a0 <== just t0 continues to present itself, t1 is sleeping
 I'm thread 3fff9a4af1a0 <== and main thread is in an idle loop after the SIGTRAP
 Trace/breakpoint trap <== but then t1 executes the trap HW instruction
 ```
-
-
 
 [1] Section 22.4 - Hardware-Generated Signals, in *The Linux Programming Interface*,
 Michael Kerrisk.
