@@ -44,8 +44,8 @@ a SIGTRAP that is due to a `trap` instruction, i.e. in the case it is due to a
 hardware exception. This is really expected since "In the case of a hardware ex-
 ception blocking the signal makes little sense as it is unclear how a program
 should then continue execution. [Thus] starting with Linux 2.6, if the signal is
-blocked, then the process is always immediately _killed by the signal_, even if
-the process has installed a handler for the signal" [1].
+blocked, then the process is **always** immediately **killed by the signal**,
+even if the process has installed a handler for the signal" [1].
 
 Hence this example exactly tries to show this behavior by setting the main thread
 to accept a SIGTRAP but setting the thread *t1* (which genereates a hardware trap)
