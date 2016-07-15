@@ -53,7 +53,38 @@ as to deny a SIGTRAP. Thus when a SIGTRAP from `kill` arrives it hits the handle
 of main thread (kernel randomly picks the thread that unblocks this signal, in
 that case just the main thread), but since *t1* blocks SIGTRAP and also executes
 an `trap` instruction - and SIGTRAP from hardware cannot be denied - the process
-as whole is killed by the kernel.
+as whole is killed by the kernel:
+
+```
+$ ./threads04
+Hi, I'm the main thread ;-)   <== main thread
+I'm thread 3fff809af1a0. I'll trigger a hardware SIGTRAP in 4 seconds <== t1
+I'm thread 3fff801af1a0 <== t0
+I'm thread 3fff801af1a0
+Hi, I'm the main thread ;-)
+I'm thread 3fff801af1a0
+Hi, I'm the main thread ;-)
+I'm thread 3fff801af1a0
+Hi, I'm the main thread ;-)
+Trace/breakpoint trap
+```
+and if a SIGTRAP is sent by `kill` command the main thread accepts it, nonetheless
+when the SIGTRAP due to a HW exception arrives thread *t1* the whole process dies:
+
+```
+$ ./threads04
+Hi, I'm the main thread ;-) <== main thread
+I'm thread 3fff9acaf1a0. I'll trigger a hardware SIGTRAP in 4 seconds <== t1 thread
+I'm thread 3fff9a4af1a0 <== t0 thread
+Hi, I'm the main thread ;-)
+I'm thread 3fff9a4af1a0
+Received a SIGTRAP <== kill -SIGTRAP, main thread gets it fine and stops
+I'm thread 3fff9a4af1a0 <== just t0 continues to present itself, t1 is sleeping
+I'm thread 3fff9a4af1a0 <== and main thread is in an idle loop after the SIGTRAP
+Trace/breakpoint trap <== but then t1 executes the trap HW instruction
+```
+
+
 
 [1] Section 22.4 - Hardware-Generated Signals, in *The Linux Programming Interface*,
 Michael Kerrisk.
