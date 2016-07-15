@@ -27,8 +27,8 @@ threads, given that you did not send any SIGTRAP before ;-)
 
 This is a example on how to block or unblock a set of signals as per thread. At
 first, it seems straightforward that just passing `&setsig` and the action on it,
-i.e `SIG_BLOCK or SIG_UNBLOCK` when creating a thread is just fine - when calling
-`pthread_create()`, however, in fact, the last call on this function will also
+i.e `SIG_BLOCK or SIG_UNBLOCK`, when creating a thread is just fine - when calling
+`pthread_create()`. However, in fact, the last call on this function will also
 determine the block state in the main thread. So to adjust the main thread block
 state it's necessary to call `sigprocmask()` *after* we create and set the block
 state for the last thread (in this case *t1*). Thus in [threads02.c] (threads02.c)
