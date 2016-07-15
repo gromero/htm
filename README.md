@@ -35,3 +35,25 @@ state for the last thread (in this case *t1*). Thus in [threads02.c] (threads02.
 main thread is not really blocked regarding SIGTRAP since `sigprocmask()` it's
 called before `pthread_create()`. However, in [threads03.c] (threads03.c) SIGTRAP
 is blocked, since `sigprocmask()` is called after `pthread_create()`.
+
+#### [threads04.c] (threads04.c)
+
+This example tries to show two things: (1) that signals can be delivered as per
+thread and (2) a SIGTRAP caught from a `kill -SIGTRAP <pid>` is not the same as
+a SIGTRAP that is due to a `trap` instruction, i.e. in the case it is due to a
+hardware exception. This is really expected since "In the case of a hardware ex-
+ception blocking the signal makes little sense as it is unclear how a program
+should then continue execution. [Thus] starting with Linux 2.6, if the signal is
+blocked, then the process is always immediately _killed by the signal_, even if
+the process has installed a handler for the signal" [1].
+
+Hence this example exactly tries to show this behavior by setting the main thread
+to accept a SIGTRAP but setting the thread *t1* (which genereates a hardware trap)
+as to deny a SIGTRAP. Thus when a SIGTRAP from `kill` arrives it hits the handler
+of main thread (kernel randomly picks the thread that unblocks this signal, in
+that case just the main thread), but since *t1* blocks SIGTRAP and also executes
+an `trap` instruction - and SIGTRAP from hardware cannot be denied - the process
+as whole is killed by the kernel.
+
+[1] Section 22.4 - Hardware-Generated Signals, in *The Linux Programming Interface*,
+Michael Kerrisk.
