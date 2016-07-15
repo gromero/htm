@@ -46,7 +46,7 @@ A minuscule study on Linux threads and signals
 ### [threads01.c] (threads01.c)
 
 What happens when a multithread process gets a signal:
-- Does it stop all threads?
+- Does it stop all the threads in a process?
 - Does it stop a single thread at random?
 
 This simple code installs a signal handler. Since it is done before the thread
