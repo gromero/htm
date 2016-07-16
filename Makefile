@@ -39,4 +39,7 @@ clean:
 	rm -fr increment
 	rm -fr increment_thread
 	rm -fr increment_thread_htm
-	rm -fr threads01
+	rm -fr threads??
+	rm -fr increment_thread_htm_signal
+	rm -fr increment_thread_htm_syscall
+
