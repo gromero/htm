@@ -34,6 +34,9 @@ threads03:	threads03.o
 threads04:	threads04.o
 	gcc -pthread -mhtm -mcpu=power8 -g -O0 threads04.o -o threads04
 
+threads05:	threads05.o
+	gcc -pthread -mhtm -mcpu=power8 -g -O0 threads05.o -o threads05
+
 clean:
 	rm -fr *.o *.S contention
 	rm -fr increment
