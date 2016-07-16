@@ -43,9 +43,9 @@ for i in `seq 1 100`; do ./increment_thread_htm_syscall |& gawk ' /\./ { htm_fai
 A minuscule study on Linux threads and signals
 ==============================================
 
-> `printf()` is say to be a _persona non grata_ inside a signal handler. As of
-> 2015/08, its manual says "MT-Safe", but there is "locale" after, so not sure.
-> Anyway, it's not that important for our purpose here, AFAICS.
+> `printf()` is said to be a _persona non grata_ inside a signal handler. As of
+> 2015/08 its manual says "MT-Safe", but there is "locale" after, so not sure.
+> Anyway it's not that important for our purpose here, AFAICS.
 
 ### [threads01.c] (threads01.c)
 
