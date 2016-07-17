@@ -133,3 +133,12 @@ Trace/breakpoint trap <== but then t1 executes the trap HW instruction
 
 [1] Section 22.4 - Hardware-Generated Signals, in *The Linux Programming Interface*,
 Michael Kerrisk.
+
+### [threads05.c] (threads05.c)
+
+Now things start to become interesting. An executiong of trap/illegal instruction
+inside a thread (could also be in a single process) yields an infite loop. Signal
+handler returns but get again the instruction.
+
+It's necessary to know the context were the trap/illegal instruction happened to
+then know the pc and manage it.
