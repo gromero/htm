@@ -152,5 +152,5 @@ what now? Well, the Linux kernel kindly takes care of it ;-) It means that the
 next instruction pointer regarding the context interrupted async by the signal is
 available thought the member `uc->uc_mcontext.regs->nip`.
 
-Nonetheless, we'll try this approch on the next example. By this example just shows
-that infinite loop behavior
+Nonetheless, we'll try this approch on the next example. By now this example just
+demonstrates that infinite loop behavior
