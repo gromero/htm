@@ -141,4 +141,13 @@ inside a thread (could also be in a single process) yields an infite loop. Signa
 handler returns but get again the instruction.
 
 It's necessary to know the context were the trap/illegal instruction happened to
-then know the pc and manage it.
+then know the pc and manage it, I mean, increment the pc to point at the instruc-
+tion after the trap/illegal instruction.
+
+If it was on a x64 we could do that, given that `uc` is `ucontext_t *uc`, we can
+do this: `uc->uc_mcontext.greps[REG_RIP] += __offender_instruction_length__`.
+
+But I've got good news: POWER8 lacks an IP (Instruction Pointer) register. So
+what now? Well, the Linux kernel kindly takes care of it ;-) It means that the
+next instruction pointer regarding the context interrupted async by the signal is
+available thought the member `uc->uc_mcontext.regs->nip`.
