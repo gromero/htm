@@ -8,6 +8,11 @@
 #include <signal.h>
 
 
+
+/********************/
+/*     HELPERS      */
+/********************/
+
 /*******************/
 /* SIGNAL HANDLERS */
 /*******************/
@@ -31,12 +36,13 @@ void signal_handler(int sig)
 
 
 /* ADVANCED SIGNAL HANDLER */
-void advanced_sinal_handler(int signo, siginfo_t si, void *data)
+void advanced_signal_handler(int signo, siginfo_t *si, void *data)
 {
- uncontext_t *uc = (ucontext_t *)data; // Set a local pointer to uc.
- uc->uc_mcontext.regs->nip += 4; // Skip illegal instruction.
+//  ucontext_t *uc = (ucontext_t *)data; // Set a local pointer to uc.
 
- printf("Received a SIGTRAP\n");
+ while (1 == 1)
+   printf("Received a SIGTRAP\n");
+//  uc->uc_mcontext.regs->nip += 4; // Skip illegal instruction.
 }
 
 /***********/
@@ -108,15 +114,26 @@ int main(void)
 
  sigset_t sigset;
 
+ struct sigaction sa;
+
+ // Install thread-shared signal handler.
+// sa.sa_flags = SA_ONSTACK | SA_RESTART | SA_SIGINFO;
+ sa.sa_flags = SA_SIGINFO;
+ sa.sa_sigaction = advanced_signal_handler;
+ sigaction(SIGTRAP, &sa, NULL);
+ sigaction(SIGILL , &sa, NULL);
+
+ // Create the set containing signals to be unblocked.
  sigemptyset(&sigset);
  sigaddset(&sigset, SIGTRAP);
+ sigaddset(&sigset, SIGILL );
 
  pthread_sigmask(SIG_UNBLOCK, &sigset, NULL);
  pthread_create(&t0, NULL, worker_with_trap, (void*) &sigset);
 
- signal(SIGTRAP, signal_handler);
- signal(SIGILL , signal_handler);
- signal(SIGHUP , signal_handler);
+// signal(SIGTRAP, signal_handler);
+// signal(SIGILL , signal_handler);
+// signal(SIGHUP , signal_handler);
 
  pthread_sigmask(SIG_BLOCK, &sigset, NULL);
  pthread_create(&t1, NULL, worker /*_with_htm*/, (void*) &sigset);

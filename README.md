@@ -134,7 +134,7 @@ Trace/breakpoint trap <== but then t1 executes the trap HW instruction
 [1] Section 22.4 - Hardware-Generated Signals, in *The Linux Programming Interface*,
 Michael Kerrisk.
 
-### [threads05.c] (threads05.c)
+### [threads05.c] (threads05.c), [threads06.c] (threads06.c)
 
 Now things start to become interesting. An executiong of trap/illegal instruction
 inside a thread (could also be in a single process) yields an infite loop. Signal
@@ -144,6 +144,9 @@ It's necessary to know the context were the trap/illegal instruction happened to
 then know the pc and manage it, I mean, increment the pc to point at the instruc-
 tion after the trap/illegal instruction.
 
+[threads05.c] (threads05.c) examplifies that case with a single handler whilst
+[threads06.c] (threads06.c) examplifies that case with an advanced handler.
+
 If it was on a x64 we could do that, given that `uc` is `ucontext_t *uc`, we can
 do this: `uc->uc_mcontext.greps[REG_RIP] += __offender_instruction_length__`.
 
@@ -152,5 +155,5 @@ what now? Well, the Linux kernel kindly takes care of it ;-) It means that the
 next instruction pointer regarding the context interrupted async by the signal is
 available thought the member `uc->uc_mcontext.regs->nip`.
 
-Nonetheless, we'll try this approch on the next example. By now this example just
+Nonetheless, we'll try this approach on the next example. By now this example just
 demonstrates that infinite loop behavior
