@@ -84,7 +84,8 @@ void* worker_with_trap(void *in)
 
   // Unconditional trap instruction that provokes a HW exception.
   // It's a PowerPC specific instruction.
-  asm (".long 0x0     \n\t");
+  //asm (".long 0x0     \n\t");
+  asm ("trap  \n\t");
  }
 }
 
@@ -96,13 +97,14 @@ void* worker_with_htm(void *sig)
 
  while (1 == 1)
  {
-  printf("I'm thread %lx. I'll perform an HTM transaction every 1 seconde\n", my_id);
+  printf("I'm thread %lx. I'll perform an HTM transaction every 1 second\n", my_id);
   sleep(1);
   asm (
-       "1: tbegin. \n\t"
-       "   beq 1b  \n\t"
+       "   tbegin. \n\t"
+       "   beq 2f  \n\t"
+       "   trap    \n\t"
        "   tend.   \n\t"
-       "   b 1b    \n\t"
+       "2:         \n\t"
        :
        :
        :
@@ -135,15 +137,15 @@ int main(void)
  sigaddset(&sigset, SIGTRAP);
  sigaddset(&sigset, SIGILL );
 
- pthread_sigmask(SIG_UNBLOCK, &sigset, NULL);
- pthread_create(&t0, NULL, worker_with_trap, (void*) &sigset);
+ pthread_sigmask(SIG_BLOCK, &sigset, NULL);
+ pthread_create(&t0, NULL, worker /* _with_trap */, (void*) &sigset);
 
 // signal(SIGTRAP, signal_handler);
 // signal(SIGILL , signal_handler);
 // signal(SIGHUP , signal_handler);
 
- pthread_sigmask(SIG_BLOCK, &sigset, NULL);
- pthread_create(&t1, NULL, worker /*_with_htm*/, (void*) &sigset);
+ pthread_sigmask(SIG_UNBLOCK, &sigset, NULL);
+ pthread_create(&t1, NULL, worker_with_htm, (void*) &sigset);
 
  // Let's see if after setting mask for t1 main, which unblocks
  // SIGTRAP, main thread remains with SITRAP blocked.
