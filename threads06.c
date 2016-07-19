@@ -38,11 +38,11 @@ void signal_handler(int sig)
 /* ADVANCED SIGNAL HANDLER */
 void advanced_signal_handler(int signo, siginfo_t *si, void *data)
 {
-//  ucontext_t *uc = (ucontext_t *)data; // Set a local pointer to uc.
+//ucontext_t *uc = (ucontext_t *)data; // Set a local pointer to uc.
+//uc->uc_mcontext.regs->nip += 4; // Skip illegal instruction.
 
- while (1 == 1)
-   printf("Received a SIGTRAP\n");
-//  uc->uc_mcontext.regs->nip += 4; // Skip illegal instruction.
+//while (1 == 1)
+    printf("Received a SIGTRAP\n");
 }
 
 /***********/
