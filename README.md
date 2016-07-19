@@ -157,3 +157,9 @@ available thought the member `uc->uc_mcontext.regs->nip`.
 
 Nonetheless, we'll try this approach on the next example. By now this example just
 demonstrates that infinite loop behavior
+
+### [threads07.c] (threads07.c)
+
+This example solves infite loop by adding 4 bytes in the nip (next instruction
+pointer). On PPC64 LE all instructions have the same length, 4 bytes. So skipping
+the offending struction is trivial.
