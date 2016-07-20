@@ -166,7 +166,7 @@ the offending struction is trivial.
 
 ### [threads08.c] (threads08.c)
 
-__Now things start to get interesting__ One thread is set to perform a HTM with a
+__Now things start to get interesting__. One thread is set to perform a HTM with a
 trap instruction inside. An advanced signal hander is set to get the signal.
 
 HTM fails due to `trap` instruction. It's possible to verify that, tho si->si_addr
