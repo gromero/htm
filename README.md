@@ -163,3 +163,17 @@ demonstrates that infinite loop behavior
 This example solves infite loop by adding 4 bytes in the nip (next instruction
 pointer). On PPC64 LE all instructions have the same length, 4 bytes. So skipping
 the offending struction is trivial.
+
+### [threads08.c] (threads08.c)
+
+__Now things start to get interesting__ One thread is set to perform a HTM with a
+trap instruction inside. An advanced signal hander is set to get the signal.
+
+HTM fails due to `trap` instruction. It's possible to verify that, tho si->si_addr
+in this is not that same value of `uc->uc_mcontext.regs->nip`, `uc->uc_link` isn't
+NULL thus we have a second `ucontext_t` struct that is related exactly to the
+context where the `trap` instruction (primary cause of SIGTRAP in this example)
+was executed. So indeed we have two ucontext_t in this case: (a) inside HTM, where
+pc = tbegin + 4 and (b) where a `trap` instruction was executed - in this example
+it's inside the HTM, just after the `beq` (the HTM failure handler) but could be
+anywhere else.
