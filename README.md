@@ -169,11 +169,13 @@ the offending struction is trivial.
 __Now things start to get interesting__. One thread is set to perform a HTM with a
 trap instruction inside. An advanced signal hander is set to get the signal.
 
-HTM fails due to `trap` instruction. It's possible to verify that, tho si->si_addr
-in this is not that same value of `uc->uc_mcontext.regs->nip`, `uc->uc_link` isn't
-NULL thus we have a second `ucontext_t` struct that is related exactly to the
-context where the `trap` instruction (primary cause of SIGTRAP in this example)
-was executed. So indeed we have two ucontext_t in this case: (a) inside HTM, where
-pc = tbegin + 4 and (b) where a `trap` instruction was executed - in this example
-it's inside the HTM, just after the `beq` (the HTM failure handler) but could be
-anywhere else.
+HTM fails due to a `trap` instruction inside a HTM block delimitted by `tbegin.`
+and `tend.`. It's possible to verify that, although `si->si_addr` contains not
+them same value as `uc->uc_mcontext.regs->nip`,  what would be the normal case,
+`uc->uc_link` isn't, on the other hand, NULL. Thus in fact we have a second `ucontext_t`
+struct that is related exactly to the context where the `trap` instruction inside
+the HTM block, the instruction responsible for the generation of the SIGTRAP) was
+executed. So indeed we have two ucontext_t in this case: (a) inside HTM, where
+pc = tbegin. + 4 and (b) where a `trap` instruction was executed - in this
+example it's inside the HTM, just after the `beq` - the HTM failure handler - but
+could be anywhere else.
