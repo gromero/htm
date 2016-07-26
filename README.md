@@ -179,3 +179,11 @@ executed. So indeed we have two ucontext_t in this case: (a) inside HTM, where
 pc = tbegin. + 4 and (b) where a `trap` instruction was executed - in this
 example it's inside the HTM, just after the `beq` - the HTM failure handler - but
 could be anywhere else.
+
+### [threads09.c] (threads09.c)
+
+This test case demonstrates that given a number of nested HTM blocks, if any HTM
+transaction fails, then the first context (uc) will have a (nip) point to the
+most outer HTM failure handler. si->si_addr, nonetheless, still points fine to
+the primary cause of HTM failure, i.e to the trap instruction inside the most
+inner HTM transaction.
