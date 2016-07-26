@@ -25,7 +25,6 @@ void signal_handler(int sig)
  switch(sig)
  {
    case SIGTRAP: printf("Received a SIGTRAP\n");
-                 // while (1 == 1) ;
                  break;
    case SIGILL : printf("Received a SIGILL\n");
                  break;
@@ -41,7 +40,7 @@ void signal_handler(int sig)
 void advanced_signal_handler(int signo, siginfo_t *si, void *data)
 {
  ucontext_t *uc = (ucontext_t *)data; // Set a local pointer to uc.
- ucontext_t *t_uc = uc->uc_link;
+ ucontext_t *t_uc = uc->uc_link; // In case we were in a HTM.
 
  if (!t_uc)
  {
@@ -112,21 +111,36 @@ void* worker_with_htm(void *sig)
   printf("I'm thread %lx. I'll perform an HTM transaction every 1 second\n", my_id);
   sleep(1);
   asm (
-       "   tbegin. \n\t"
-       "   beq 2f  \n\t"
-       "   trap    \n\t"
-       "   tend.   \n\t"
-       "2:         \n\t"
+       "   tbegin.        \n\t" // Begin first HTM level.
+       "   beq 2f         \n\t"
+
+       "   tbegin.        \n\t" // Begin second HTM level.
+       "   beq 2f         \n\t"
+
+       "   tbegin.        \n\t" // Begin third HTM level.
+       "   beq 2f         \n\t"
+       "   mr  15, 16     \n\t"
+       "   mr  14, 15     \n\t"
+       "   trap           \n\t"
+       "   mr  15, 16     \n\t"
+       "   mr  14, 15     \n\t"
+       "   tend.          \n\t" // End third HTM level.
+
+       "   xor 14, 16, 16 \n\t"
+       "   tend.          \n\t" // End second HTM level.
+
+       "   tend.          \n\t" // End first HTM level.
+       "2:                \n\t"
        :
        :
-       :
+       : "r14", "r15", "r16"
       );
  }
 }
 
 /* Main thread BLOCKs   SIGTRAP -> idle worker
-   t0   thread BLOCKs   SIGTRAP -> TRAP worker
-   t1   thread UNBLOCKs SIGTRAP -> HTM  worker */
+   t0   thread BLOCKs   SIGTRAP -> idle worker
+   t1   thread UNBLOCKs SIGTRAP -> HTM  + trap worker */
 
 int main(void)
 {
@@ -149,6 +163,7 @@ int main(void)
  sigaddset(&sigset, SIGTRAP);
  sigaddset(&sigset, SIGILL );
 
+ // Create thread t0
  pthread_sigmask(SIG_BLOCK, &sigset, NULL);
  pthread_create(&t0, NULL, worker /* _with_trap */, (void*) &sigset);
 
@@ -156,6 +171,7 @@ int main(void)
 // signal(SIGILL , signal_handler);
 // signal(SIGHUP , signal_handler);
 
+ // Create thread t1 -> HTM + trap inside.
  pthread_sigmask(SIG_UNBLOCK, &sigset, NULL);
  pthread_create(&t1, NULL, worker_with_htm, (void*) &sigset);
 
