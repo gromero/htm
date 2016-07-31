@@ -54,6 +54,8 @@ A minuscule study on Linux threads and signals
 > bits 63-29:63-30, or 34:33, that's the reason you gonna see them in Linux kernel
 > source code as 34:33, and not as 29:30: (arch/powerpc/include/asm/reg.h) [https://goo.gl/YmYUcV].
 
+#
+
 > `printf()` is said to be a _persona non grata_ inside a signal handler. As of
 > 2015/08 its manual says "MT-Safe", but there is "locale" after, so not sure.
 > Anyway it's not that important for our purpose here, AFAICS.
