@@ -44,7 +44,7 @@ A minuscule study on Linux threads and signals
 ==============================================
 
 > First of all, __before you get insane__, let me say that POWER ISA, any version,
-> uses the so-called IBM bit numbering scheme (aka [MSB 0] (https://goo.gl/AjTpCQ])).
+> uses the so-called IBM bit numbering scheme (aka [MSB 0] (https://goo.gl/AjTpCQ)).
 > So whenever you read the MSR (Machine State Register) bit offsets - for
 > instance -, please, mind that you have to read as 63-BIT_OFFSET (regardless of the
 > endianess, since shifts are performed as per value in register).
