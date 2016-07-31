@@ -43,6 +43,17 @@ for i in `seq 1 100`; do ./increment_thread_htm_syscall |& gawk ' /\./ { htm_fai
 A minuscule study on Linux threads and signals
 ==============================================
 
+> First of all, __before you get insane__, let me say that POWER ISA, any version,
+> uses the so-called IBM bit numbering scheme (aka (MSB 0) [https://goo.gl/AjTpCQ]).
+> So whenever you read the MSR (Machine State Register) bit offsets - for
+> instance -, please, mind that you have to read as 63-BIT_OFFSET (regardless of the
+> endianess, since shifts are performed as per value in register).
+> Hence, for example, the MSR TS (Machine State Register Transaction Bits) are
+> said to be bits 29:30, on subsection 3.2.1, POWER ISA V2.07B, POWER8 [https://goo.gl/jrvlZS]
+> __however, actually,__ for mask and shift purposes, you want to think them as
+> bits 63-29:63-30, or 34:33, that's the reason you gonna see them in Linux kernel
+> source code as 34:33, and not as 29:30: (arch/powerpc/include/asm/reg.h) [https://goo.gl/YmYUcV].
+
 > `printf()` is said to be a _persona non grata_ inside a signal handler. As of
 > 2015/08 its manual says "MT-Safe", but there is "locale" after, so not sure.
 > Anyway it's not that important for our purpose here, AFAICS.
