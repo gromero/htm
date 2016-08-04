@@ -200,3 +200,14 @@ transaction fails, then the first context (uc) will have a (nip) point to the
 most outer HTM failure handler. si->si_addr, nonetheless, still points fine to
 the primary cause of HTM failure, i.e to the trap instruction inside the most
 inner HTM transaction.
+
+### [threads10.c] (threads10.c)
+
+A very simple example showing that the checking for a signal caught in
+transaction suggested in the Linux kernel documentation is just fine both on
+PPC64 BE and LE. If it was not the case, the detection of a signal __NOT__ caught
+in transaction would at some point be recognized as signal caught in transaction.
+As a consequence, once returning from the signal handler it would not have the
+context's nip incremented to point one instruction after the `trap` instruction,
+looping forever, as pointed out already commented in the example [threads05.c] (threads05.c)
+and [threads06.c] (threads06.c).
