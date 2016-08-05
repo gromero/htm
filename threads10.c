@@ -7,21 +7,18 @@
 
 void advanced_signal_handler(int signo, siginfo_t *si, void *data)
 {
- ucontext_t* uc = (ucontext_t *) data; // Set a local pointer to uc.
- ucontext_t* t_uc = uc->uc_link;       // Second context HTM.
+ ucontext_t* uc = (ucontext_t *) data;
+ ucontext_t* t_uc = uc->uc_link;       // Second transactional context HTM.
 
  if (t_uc != NULL) {
   if (t_uc->uc_mcontext.regs->msr & 0x600000000) {
-    printf("* Caught a SIGTRAP in transaction\n");
-    printf("* si->si_addr = %p\n", si->si_addr);
-    printf("* uc->uc_mcontext.regs->nip: = %p\n", (void *) uc->uc_mcontext.regs->nip);
-    printf("* t_uc->uc_mcontext.regs->nip = %p\n", (void *) t_uc->uc_mcontext.regs->nip );
+    printf("* Caught a SIGTRAP in transaction:         ");
+    printf("uc->uc_mcontext.regs->msr = %p\n", (void *) uc->uc_mcontext.regs->msr);
     return;
   }
  }
-    printf("* Caught a SIGTRAP but NOT in transaction\n");
-    printf("* si->si_addr = %p\n", si->si_addr);
-    printf("* uc->uc_mcontext.regs->nip = %p\n", (void *) uc->uc_mcontext.regs->nip);
+    printf("* Caught a SIGTRAP but NOT in transaction: ");
+    printf("uc->uc_mcontext.regs->msr = %p\n", (void *) uc->uc_mcontext.regs->msr);
     uc->uc_mcontext.regs->nip += 4;
 }
 
