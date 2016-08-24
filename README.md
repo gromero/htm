@@ -40,19 +40,23 @@ for i in `seq 1 100`; do ./increment_thread_htm_syscall |& gawk ' /\./ { htm_fai
 3. It's yet to be done the test to determine when a given number of threads causes performance degradation for the case test.
 
 
-A minuscule study on Linux threads and signals
-==============================================
+A minuscule study on Linux threads, signals, and HTM
+====================================================================
 
 > First of all, __before you get insane__, let me say that POWER ISA, any version,
 > uses the so-called IBM bit numbering scheme (aka [MSB 0] (https://goo.gl/AjTpCQ)).
-> So whenever you read the MSR (Machine State Register) bit offsets - for
-> instance -, please, mind that you have to read as 63-BIT_OFFSET (regardless of the
+> So whenever you read the MSR (Machine State Register) bit offsets (for
+> instance), please, mind that you have to read as 63-BIT_OFFSET (regardless of the
 > endianess, since shifts are performed as per value in register).
 > Hence, for example, the MSR TS (Machine State Register Transaction Bits) are
 > said to be bits 29:30, on subsection 3.2.1, [POWER ISA V2.07B, POWER8] (https://goo.gl/jrvlZS),
 > __however, actually,__ for mask and shift purposes, you want to think them as
 > bits 63-29:63-30, or 34:33, that's the reason you gonna see them in Linux kernel
 > source code as 34:33, and not as 29:30: [arch/powerpc/include/asm/reg.h] (https://goo.gl/YmYUcV).
+> This by no means it reflects the endianess, being just a matter of notation.
+> Even if in general Little-endian archs employ LSB 0 whilst BE archs employ MSB 0,
+> it could be the opposite, since LSB 0 and MSB 0 are just two different
+> convenient ways to refer to bits in a register.
 
 #
 
@@ -211,3 +215,15 @@ As a consequence, once returning from the signal handler it would not have the
 context's nip incremented to point one instruction after the `trap` instruction,
 looping forever, as pointed out already commented in the example [threads05.c] (threads05.c)
 and [threads06.c] (threads06.c).
+
+### TODO
+
+ * Exception vs interruption (explain conceptual differences);
+ * HW exception/interruption vs SW exception/interruption;
+ * Does 'INT' on x64 is like a simple jump or it relies on a sort of table? On Linux
+   kernel, is the ISR that takes care of inspecting a table to find which address to
+   jump or its a burden of INT mechanism. (I'm assuming that it's just a jump and that
+   the Linux kernel installs the ISR);
+ * What is the ultimate cause of a process being able to ignore SIGTRAP from `kill`
+   but not from a `trap` instruction;
+ * Explain why a signal in HTM is quite different from a syscall in HTM;
