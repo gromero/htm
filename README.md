@@ -227,3 +227,6 @@ and [threads06.c] (threads06.c).
  * What is the ultimate cause of a process being able to ignore SIGTRAP from `kill`
    but not from a `trap` instruction;
  * Explain why a signal in HTM is quite different from a syscall in HTM;
+ * It is said that an TM on x64 has no time out (you can spend as much time as
+   you want inside an atomic block). Verify that and also check if it behaves the
+   same on Power.
