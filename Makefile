@@ -52,6 +52,9 @@ threads09:	threads09.o
 threads10:	threads10.o
 	gcc -pthread -mhtm -mcpu=power8 -g -O0 threads10.o -o threads10
 
+zica:	zica.o
+	gcc -O0 -g zica.c -o zica
+
 
 clean:
 	rm -fr *.o *.S contention
