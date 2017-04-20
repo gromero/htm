@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// #include <stdint.h>
 #include <inttypes.h>
 #include <altivec.h>
 
@@ -9,26 +8,41 @@
 
 int main(int argc, char **argv)
 {
- register vector __int128 v0 asm ("vs32");
- register vector 
- void *p = malloc(16); // 128bit storage.
+ register vector __int128 vsx0 asm ("vs0");
+ register vector __int128 vsx1 asm ("vs1");
 
- v0 = {0xBEEF};
+ register vector __int128 vmx0 asm ("vs32");
+ register vector __int128 vmx1 asm ("vs33");
+
+ vector __int128 vmx_correct_value[32];
+
+ vmx_correct_value[0] = (vector __int128) {0xC0DE};
+ vmx_correct_value[1] = (vector __int128) {0xC1DE};
+
+ vmx0 = vmx_correct_value[0]; 
+
+ vmx0 = (vector __int128) {0xBEEF};
 
  _ ("tbegin.  \n\t");
- _ ("bne FAILURE \n\t");
+ _ goto ("beq %l[_failure] \n\t" : : : : _failure);
 
  // Transactional code.
- v0 = {0xBABE};
+ vmx0 = (vector __int128) {0xBABE};
 
  // Force all transactional code to abort.
- _ ("tabort.  \n\t");
+ _ ("tabort. 0 \n\t");
 
  _ ("tend.    \n\t");
- _ ("b SUCCESS \n\t");
 
-FAILURE:
-        _ ("vcmpequb. 0, 0, 1 \n\t"); 
+ _ goto ("b %l[_success] \n\t" : : : : _success);
+
+_failure:
+        _      ("lvx 2, 0, %0 \n\t" : : "r"(vmx_correct_value) : "r5"); 
+        _      ("vcmpequb. 0, 0, 2 \n\t");
+	_ goto ("bne 6, %l[_bail_out] \n\t" : : : : _bail_out);
+        _ goto ("b %l[_bail_out2] \n\t"     : : : : _bail_out2);
+_bail_out:
+ exit(13);
 
 
 // salva vmx 1 na memoria
@@ -44,11 +58,11 @@ FAILURE:
 //
 // ...
 //
+_bail_out2:
 	printf("HTM failed\n");
-        
 	exit(1);
 
-SUCCESS:
+_success:
 	printf("HTM succeeded\n");
 	exit(0);
 }
