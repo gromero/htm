@@ -8,7 +8,10 @@
 int main(int argc, char **argv)
 {
  register int x asm ("r4") = 12;
- register vector __int128  v0 asm ("vs32") = {0xBEEF};
+ register vector __int128  vsr0 asm ("vs0") = {0xBABE};
+ register vector __int128  vr0 asm ("vs32") = {0xBEEF};
+ void *p;
+ p = malloc(16);
 asm (
      "xxlxor 32,32,32 \n\t"
      "xxlxor 33,33,33 \n\t"
